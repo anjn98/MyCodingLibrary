@@ -1,3 +1,7 @@
+ /*
+Taken from https://github.com/anjn98/MyCodingLibrary
+*/
+ 
  
 int maxn=1e5;
 ll tree[4*maxn];

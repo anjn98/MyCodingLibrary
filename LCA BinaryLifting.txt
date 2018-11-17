@@ -1,3 +1,7 @@
+/*
+Taken from https://github.com/anjn98/MyCodingLibrary
+*/
+
 const int l=30, maxn=1e5;
 int up[maxn][l+2],tin[maxn],tout[maxn],timer;
 void dfs(int v, int p)

@@ -1,0 +1,158 @@
+/*
+<------------------------------------------------------------------------------------------------------------>
+						      ANJAN AGARWALA   @anjn98                      
+		        				JADAVPUR UNIVERSITY        				   
+<------------------------------------------------------------------------------------------------------------>
+#include<geeksforgeeks.h>
+#include<stackoverflow.h>
+*/
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long int ll;
+#define FIO ios_base::sync_with_stdio(false);cin.tie(0);cout.tie(0);
+ll power(ll x,ll y,ll p){ll r=1;x=x%p;while(y){if(y&1)r= r*x%p;y=y>>1;x=x*x%p;}return r;}
+#define all(v) v.begin(),v.end()
+#define PR(a) cout<<"("<<a<<")";
+#define ED cout<<'\n';
+#define loop(j,a,n)  for(int j=a;j<=n;j++)
+#define loop1(j,a,n)  for(int j=a;j>=n;j--)
+#define fr1(j,n)  for(int j=0;j<n;j++)
+#define fr(n)  for(int i=0;i<n;i++)
+#define fra(s) for(auto x:s)
+#define PB push_back
+#define MP make_pair
+#define pii pair<int,int>
+#define F first
+#define S second 
+#define mod 100000000
+const int  N=1e5+9;
+ll tree[5*N][24];
+ll a[N],lazy[5*N];
+
+
+
+//------------------------------------------------------------------------------------
+
+
+
+
+void build(int i,int l,int r)
+{
+    if(l==r)
+    {
+        fr1(j,24)
+        if(!(a[l]&(1LL<<j)))tree[i][j]=1;
+        else tree[i][j]=0;
+        return ;
+    }
+    build(2*i, l , (l+r)/2);
+    build(2*i+1, 1+ (l+r)/2,r);
+    fr1(j,24)
+    tree[i][j]=tree[2*i+1][j]+tree[2*i][j];
+}
+
+
+
+
+//------------------------------------------------------------------------------------
+
+
+
+void update(int i,int l,int r,int x,int y,ll val)
+{
+    if(lazy[i]!=0)
+    {
+        fr1(j,24)
+        if(!(lazy[i]&(1LL<<j)))
+            tree[i][j]=(r-l+1);
+        else
+            tree[i][j]=0;
+            
+        if(l!=r)
+            lazy[2*i]=lazy[i],lazy[1+2*i]=lazy[i];
+            
+        lazy[i]=0;
+    }
+    if(r< x || l>y) return;
+    if(l>=x && r<=y)
+    {
+        fr1(j,24)
+        if(!(val&(1LL<<j)))tree[i][j]=r-l+1;
+        else tree[i][j]=0;
+        if(l!=r)
+            lazy[2*i]=val,lazy[1+2*i]=val;
+        return ;
+    }
+    update(2*i  ,l        ,(l+r)/2,x,y,val);
+    update(1+2*i,1+(l+r)/2, r     ,x,y,val);
+    fr1(j,24)
+    tree[i][j]=tree[2*i+1][j]+tree[2*i][j];
+}
+
+
+//------------------------------------------------------------------------------------
+
+
+
+ll query(int i, int l , int r, int x, int y,int b)
+{
+    if(lazy[i]!=0)
+    {
+        fr1(j,24)
+        if(!(lazy[i]&(1LL<<j)))
+            tree[i][j]=(r-l+1);
+        else
+            tree[i][j]=0;
+            
+        if(l!=r)
+            lazy[2*i]=lazy[i],lazy[1+2*i]=lazy[i];
+            
+        lazy[i]=0;
+    }
+    if(l>y || r<x) return 0;
+    if(l>=x && r<=y) return tree[i][b];
+    return (query(2*i, l , (l+r)/2, x, y,b)+query(2*i+1, 1+(l+r)/2,r, x, y,b));
+    
+}
+//--------------------------------------------------------------------------------
+
+int main()
+{	
+	FIO
+	int n;cin>>n;
+	fr(n)cin>>a[i];
+	build(1,0,n-1);
+	int q;cin>>q;
+	
+	
+	
+	while(q--)
+	{
+	    ll ty,l,r,v;
+	    cin>>ty>>l>>r;
+	    if(ty==1){cin>>v;update(1,0,n-1,l-1,r-1,v);
+	    }
+	    else 
+	    {
+	        ll ans=0;
+	        fr(24)
+	        {
+	            ll p=query(1,0,n-1,l-1,r-1,i)   ;
+	            //cout<<p<<"-"; 
+	            p=((r-l+1)*(r-l)*(r-l-1) -p*(p-1)*(p-2))/6;
+	            //cout<<p<<" "; 
+                p=p%mod;	            
+	            ans+=(((1LL<<i)*p)%mod);
+	            ans%=mod;
+	            
+	        }
+	        
+	        cout<<ans%mod<<endl;
+	    }
+	    
+	    
+	}
+}
+
+
+

@@ -1,2 +1,28 @@
+/*
+Taken from https://github.com/anjn98/MyCodingLibrary
+*/
+
+
+
+ /*
+Note using a single hash value for string hashing can sometimes result in collision i.e., two or more substrings can have same hash value.
+So instead use a pair of hash values for each substring.
+
+HERE IS A SAMPLE PROBLEM FROM CODEFORCES ON STRING HASHING : 
+http://codeforces.com/problemset/problem/271/D
+
+USING SINGLE HASH RESULTS IN WA:
+http://codeforces.com/contest/271/submission/45148287
+
+USING PAIR OF HASH GIVES AC: 
+http://codeforces.com/contest/271/submission/45148572
+
+*/
+
+
+
+
+
+
 ll pow1 = 97266353, mod1 = 972663749;
 ll pow1 = 97336357, mod2 = 1000000007;

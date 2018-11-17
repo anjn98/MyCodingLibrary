@@ -1,3 +1,5 @@
+/* Taken from https://github.com/anjn98/MyCodingLibrary
+*/
 int maxn=1e5;
 // start bit at 1 index
 ll bit[maxn];

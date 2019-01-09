@@ -11,7 +11,7 @@ struct COMP{
 
 set<int,COMP> DJ;
 
-void djikstra(int s)
+void dijkstra(int s)
 {
     DJ.insert(s);    
     for(int i=0;i<N;i++) dis[i]=1e17;

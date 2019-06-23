@@ -1,0 +1,22 @@
+const int LEN = 1e5 + 5;
+int rad[2 * LEN], sn;
+
+
+void build_rad (string s)
+{
+	int sn=s.length();
+	for (int i = 0, j = 0, k; i < sn; i += k, j = max(j - k, 0))
+	{
+		for (; i >= j && i + j + 1 < sn && s[(i - j) / 2] == s[(i + j + 1) / 2]; ++j);
+		
+		rad[i] = j;
+		
+		for (k = 1; i >= k && rad[i] >= k && rad[i - k] != rad[i] - k; ++k)
+			rad[i + k] = min(rad[i - k], rad[i] - k);
+	}
+}
+
+bool is_palindrome (int b, int e)
+{
+	return b >= 0 && e < sn &&  rad[b + e] >= e - b + 1;
+}

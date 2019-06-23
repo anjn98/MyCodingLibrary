@@ -1,0 +1,11 @@
+vector<int> zalgo(string s)
+{
+    	vector<int> z(s.length()+1);
+	for(int i=1,l=0,r=0;i<s.length();i++)
+	{
+        	if(i<=r) z[i]=min(r-i+1,z[i-l]);
+	        while(i+z[i]<s.length() && s[i+z[i]]==s[z[i]])   z[i]++;
+	        if(i+z[i]-1>r)  l=i,r=i+z[i]-1;
+    	}
+	return z;
+}

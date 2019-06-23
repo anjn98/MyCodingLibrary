@@ -1,0 +1,42 @@
+
+// String hashing part taken from anjn98's github library
+
+
+class KMP
+{
+public:
+const int maxn=1e6+99;
+ll pow1 = 97266353, mod1 = 972663749;
+ll pow2 = 97336357, mod2 = 1000000007;
+
+ll hsh1[maxn],hsh2[maxn],pt1[maxn],pt2[maxn];
+
+KMP(string s)
+{
+		pt1[0]=1;pt2[0]=1;
+		for(int i=1;i<maxn;i++)
+		{
+			 pt1[i]=(pt1[i-1]*pow1)%mod1;
+			 pt2[i]=(pt2[i-1]*pow2)%mod2;
+		}
+
+		for(int i=1;i<=(int)s.size();i++)// hsh1 and hsh2 are 1-based indexed		
+		{
+			hsh1[i]=(hsh1[i-1]*pow1 + s[i-1]-'a'+1)%mod1;
+			hsh2[i]=(hsh2[i-1]*pow2 + s[i-1]-'a'+1)%mod2;
+		}
+}
+
+pair<long long,long long> calc(int l,int r)//[l,r]  [0,n-1]
+{
+
+	long long ans1= hsh1[r+1] - hsh1[l]*pt1[r-l+1];
+	ans1%=mod1; ans1=(ans1+mod1)%mod1;
+
+	long long ans2=hsh2[r+1]  - hsh2[l]*pt2[r-l+1];
+	ans2%=mod2; ans2=(ans2+mod2)%mod2;
+
+	return {ans1,ans2};
+}
+
+};

@@ -1,0 +1,105 @@
+
+
+
+/*
+https://codeforces.com/contest/600/problem/E
+
+
+EASY TO CODE WITH VECTORS
+	https://codeforces.com/contest/600/submission/51126758
+
+HLD STYLE
+	https://codeforces.com/contest/600/submission/51127552	
+
+SEE THE TWO DISTINCT PARTS ONLY THATS THE DIFFERENCE BETWEEN TWO SUBMISSIONS
+*/
+
+
+const int N=1e5+99;
+ll n,col[N],ss[N],freq[N],ans[N],cnt[N]; 
+vector<int> *cll[N];
+vector<int> g[N];
+multiset<int> st;
+void dfss(int v,int p)
+{
+    ss[v]++;
+    trav(x,g[v])
+    {
+        if(x!=p) dfss(x,v),ss[v]+=ss[x];
+    }
+}
+
+//------------------------------------------------------------------------------
+void dsu(int v,int p,int keep)
+{
+    int bc=-1,mx=-1;
+    trav(x,g[v]) if(x!=p && ss[x]>mx) mx=ss[x],bc=x;
+    trav(x,g[v]) if(x!=p && x!=bc) dsu(x,v,0);
+    if(bc!=-1)    dsu(bc,v,1),cll[v]=cll[bc];
+    else cll[v]=new vector<int> ();
+
+
+    st.erase(cnt[col[v]]);  freq[cnt[col[v]]]-=col[v];
+    cnt[col[v]]++;      
+    st.insert(cnt[col[v]]);  freq[cnt[col[v]]]+=col[v];
+    cll[v]->PB(v);
+
+    trav(xx,g[v])
+        if(xx!=p && xx!=bc)   
+        {
+            trav(x,*cll[xx])
+            {
+                st.erase(cnt[col[x]]);  freq[cnt[col[x]]]-=col[x];
+                cnt[col[x]]++;      
+                st.insert(cnt[col[x]]);  freq[cnt[col[x]]]+=col[x];  
+                cll[v]->PB(x);
+            }
+        }
+
+    int ff=*(--st.end());
+    ans[v]=freq[ff];
+    if(keep==0) 
+    {
+        trav(x,*cll[v])
+            {
+                st.erase(cnt[col[x]]);  freq[cnt[col[x]]]-=col[x];
+                cnt[col[x]]--;      
+                st.insert(cnt[col[x]]);  freq[cnt[col[x]]]+=col[x];     
+            }
+    }
+}	
+		
+//--------------------------------------------------------------
+
+
+
+
+
+
+//-------------------------------------------------------------
+void add(int v,int p,int x)
+{
+    st.erase(cnt[col[v]]);  freq[cnt[col[v]]]-=col[v];
+    cnt[col[v]]+=x;      
+    st.insert(cnt[col[v]]);  freq[cnt[col[v]]]+=col[v];
+    trav(xx,g[v])  if(xx!=p && !isbig[xx]) add(xx,v,x);
+}
+
+void dsu(int v,int p,int keep)
+{
+    int bc=-1,mx=-1;
+    trav(x,g[v]) if(x!=p && ss[x]>mx) mx=ss[x],bc=x;
+    trav(x,g[v]) if(x!=p && x!=bc) dsu(x,v,0);
+    if(bc!=-1)    dsu(bc,v,1),isbig[bc]=1;
+
+    add(v,p,1);
+
+    int ff=*(--st.end());   ans[v]=freq[ff];
+
+    if(bc!=-1) isbig[bc]=0;
+    if(keep==0) 
+    {
+        add(v,p,-1);
+    }
+}
+//----------------------------------------------------------------

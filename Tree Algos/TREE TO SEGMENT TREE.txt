@@ -1,0 +1,147 @@
+
+#include<bits/stdc++.h>
+#include <ext/pb_ds/assoc_container.hpp> // Common file
+#include <ext/pb_ds/tree_policy.hpp> // Including tree_order_statistics_node_update
+#include <ext/pb_ds/detail/standard_policies.hpp>
+
+using namespace __gnu_pbds;
+using namespace std;
+
+#define ll long long int
+#define pll pair<ll,ll>
+#define MS(x, y) memset(x, y, sizeof(x))    
+#define all(x) x.begin(),x.end()
+#define ff first
+#define ss second
+#define INFL 10000000000
+#define pb push_back
+#define FIO ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+
+const ll N = 1e5 + 5;
+const ll M = 1e5 + 5;
+const ll mod = 1e9 + 7;
+const ll m1 = 1e9 + 7;
+const ll m2 = 1e9 + 9;
+const ll p1 = 402653189;
+const ll p2 = 1610612741; 
+const int LN = 32;
+
+typedef tree<ll,null_type,less<ll>,rb_tree_tag,tree_order_statistics_node_update> ordered_set;
+
+
+
+ll pw[LN],fact[N],invfact[N];
+
+
+ll a[N],par[N],st[N],en[N],curr,dp[N],lvl[N],ti[N];
+vector <ll> adj[N],prefix[4*N];
+vector <pll> segtree[4*N];
+
+void dfs(ll node,ll pa)
+{
+    par[node]=pa;
+    st[node]=++curr;
+    ti[curr]=node;
+    dp[node]=dp[pa]+a[node];
+    for(ll x:adj[node])
+    {
+        if(x==pa)continue;
+        lvl[x]=lvl[node]+1;
+        dfs(x,node);
+    }
+    en[node]=curr;
+}
+
+void build(ll pos,ll l,ll r)
+{
+    if(l==r)
+    {
+        ll node=ti[l];
+        segtree[pos].pb({dp[node],node});
+        prefix[pos].pb(lvl[node]);
+        return ;
+    }
+    ll mid=(l+r)>>1;
+    build(2*pos+1,l,mid);
+    build(2*pos+2,mid+1,r);
+    ll left=2*pos+1,right=2*pos+2;
+    ll l1=0,r1=0;
+    vector <pll> g;
+    while(l1<segtree[left].size() && r1<segtree[right].size())
+    {
+        if(segtree[left][l1].ff<=segtree[right][r1].ff)
+            g.pb({segtree[left][l1].ff,segtree[left][l1++].ss});
+        else
+            g.pb({segtree[right][r1].ff,segtree[right][r1++].ss});
+    }
+    
+    while(l1<segtree[left].size())
+        g.pb({segtree[left][l1].ff,segtree[left][l1++].ss});
+    while(r1<segtree[right].size())
+        g.pb({segtree[right][r1].ff,segtree[right][r1++].ss});
+    
+    for(ll i=0;i<g.size();i++)
+    {
+        segtree[pos].pb({g[i].ff,g[i].ss});    
+        if(i==0)
+            prefix[pos].pb(lvl[g[i].ss]);
+        else
+            prefix[pos].pb(max(lvl[g[i].ss],prefix[pos][i-1]));
+    }
+}
+
+ll query(ll pos,ll l,ll r,ll start,ll end,ll val)
+{
+    if(l>end || r<start)
+        return -INFL;
+    else if(start<=l && r<=end)
+    {
+        ll idx=upper_bound(all(segtree[pos]),pair <ll,ll> {val,INFL})-segtree[pos].begin();
+        if(idx==0)
+            return -INFL;
+        idx--;
+        return prefix[pos][idx];
+    }
+    ll mid=(l+r)>>1;
+    return max(query(2*pos+1,l,mid,start,end,val),query(2*pos+2,mid+1,r,start,end,val));
+}
+
+int main()
+{
+    FIO;
+    //pre();
+ 
+    ll n,i,j;
+    cin>>n;
+    for(i=0;i<n-1;i++)
+    {
+        ll x,y;
+        cin>>x>>y;
+        adj[x].pb(y);
+        adj[y].pb(x);
+    }
+    for(i=1;i<=n;i++)
+        cin>>a[i];
+    dfs(1,0);
+    build(0,1,n);
+    
+    ll q;
+    cin>>q;
+    while(q--)
+    {
+        ll node,s;
+        cin>>node>>s;
+        ll tmp=0;
+        if(node!=1)
+            tmp=dp[par[node]];
+        if(s<(dp[node]-tmp))
+        {
+            printf("0\n");
+            continue;
+        }
+        ll mlvl=query(0,1,n,st[node],en[node],tmp+s);
+        printf("%lld\n",mlvl-lvl[node]+1);
+    }
+    return 0;
+}
+

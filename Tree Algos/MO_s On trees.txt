@@ -1,0 +1,9 @@
+
+FOR HANDLING PATH RELATED QUERIES WHICH CAN BE SOLVED USING MOs ALGORITHM
+
+Refer to https://codeforces.com/blog/entry/43230
+
+Exmple Problem 
+
+https://www.spoj.com/problems/COT2/
+Solution:https://www.spoj.com/status/COT2,anjn98

@@ -1,0 +1,191 @@
+//https://www.spoj.com/problems/QTREE/
+
+
+const int N=1e4+99,M=16;
+vector<int> g[N],cost[N],edge[N];
+int dp[N][M],tin[N],tout[N],ss[N],timer;
+int chainNo,chainHead[N],baseArray[N],posInBase[N],chainNum[N],ptr;
+int tree[4*N],edgeInd[N];
+
+//-------------------PREPROCESS-----------------------------
+void dfss(int v,int p)
+{
+    dp[v][0]=p;tin[v]=++timer;ss[v]=1;
+    for(int i=1;i<M;i++) dp[v][i]=dp[dp[v][i-1]][i-1];  
+    for(int i=0;i<g[v].size();i++)
+    {
+        int x=g[v][i];
+        if(x==p) continue;
+        dfss(x,v);
+        ss[v]+=ss[x];
+        edgeInd[edge[v][i]]=x;
+    }
+    tout[v]=++timer;
+}
+bool isanc(int u,int v){    return tin[u]<=tin[v] && tout[v] <= tout[u]; }
+int lca(int x,int y)
+{
+    if(isanc(x,y)) return x;
+    if(isanc(y,x)) return y;
+    for(int i=M-1;i>=0;i--) if(!isanc(dp[x][i],y)) x=dp[x][i];
+    return dp[x][0];
+}
+//----------------------------------------------------------------
+
+//------------------SEGTREE  PART-----------------------
+
+
+void build_tree(int nd,int l,int r)
+{
+    if(l==r) 
+    {
+        tree[nd]=baseArray[l];
+        return ;
+    }
+    int lt=nd*2,rt=lt|1,mi=(l+r)/2;
+    build_tree(lt,l,mi);
+    build_tree(rt,mi+1,r);
+    tree[nd]=max(tree[rt],tree[lt]);
+}
+void update(int nd,int l,int r,int p,int v)
+{
+    if(l>r || l> p || r<p) return ;
+    if(l==r)
+    {
+        tree[nd]=v; 
+        return;
+    }
+    int lt=nd*2,rt=lt|1,mi=(l+r)/2;
+    update(lt,l,mi,p,v);
+    update(rt,mi+1,r,p,v);
+    tree[nd]=max(tree[lt],tree[rt]);
+}
+int query(int nd,int l,int r,int x,int y)
+{
+    if(l>r || r< x || l> y) return -1e9;
+    if(x<=l && r<=y) return tree[nd];
+    int lt=nd*2,rt=lt|1,mi=(l+r)/2;
+    return max(      query(lt,l,mi,x,y) ,   query(rt,mi+1,r,x,y)    );
+}
+
+//------------------------------------------------------------------
+
+//-----------------------QUERY PART -----------------------
+
+int query_up(int u,int v)
+{
+    if(u==v) return 0;
+    int vchain=chainNum[v],ans=-1;
+    while(1)
+    {
+
+        int uchain=chainNum[u];
+        if(vchain==uchain)
+        {
+            if(u==v) break;
+            ans=max(ans, query(1,0,ptr-1,posInBase[v]+1,posInBase[u]) );
+            break;
+        }
+
+        int prnt= chainHead[uchain] ;
+        ans=max(ans,    query(1,0,ptr-1,   posInBase[  prnt] , posInBase[u]));
+        u=prnt;
+        u=dp[u][0];
+    }
+    return ans;
+}
+
+int query_tree(int u,int v)
+{
+    if(u==v) return 0;
+    int lc=lca(u,v);
+    int ans= max( query_up(u,lc) ,  query_up(v,lc) );
+    return ans;
+}
+
+//--------------------------------------------------------------
+
+//-------------------------HLD PART--------------------------
+
+
+void HLD(int v,int p,int ct)
+{
+    if(chainHead[chainNo]==-1)
+        chainHead[chainNo]=v;
+    chainNum[v]=chainNo;
+    posInBase[v]=ptr;
+    baseArray[ptr++]=ct;
+    
+    int nx=-1,cst=0;
+    for(int i=0;i<g[v].size();i++)
+        if( (nx==-1 || (ss[g[v][i]] > ss[nx]))  && (g[v][i]!=p) )  nx= g[v][i] , cst=cost[v][i];
+    
+    if(nx!=-1){
+        HLD(nx,v,cst);
+    }
+   
+    for(int i=0;i<g[v].size();i++)
+        if(g[v][i]!=nx && g[v][i]!=p )
+        {
+            chainNo++;
+            HLD(g[v][i],v,cost[v][i]);
+        }
+}
+//---------------------HLD ENDS-----------------------------
+
+int n,m;
+int main() 
+{
+	#ifndef ONLINE_JUDGE
+	FILEIO
+	#endif
+    int t0;SC(t0);
+    while(t0--)
+    {
+        SC(n);
+        for(int i=0;i<n+5;i++)
+        {
+            g[i].clear();cost[i].clear();edge[i].clear();
+            chainHead[i]=-1;
+            fr1(j,M) dp[i][j]=0;
+        }
+        ptr=chainNo=timer=0;    tin[0]=-1e9;tout[0]=1e9;
+        for(int i=0;i<n-1;i++)
+        {
+            int x,y,v;
+            SC(x);SC(y);SC(v);
+            g[x].PB(y);
+            cost[x].PB(v);
+            edge[x].PB(i); swap(x,y);
+            g[x].PB(y);
+            cost[x].PB(v);
+            edge[x].PB(i);
+        }
+        dfss(1,0);
+        HLD(1,0,-1);
+        build_tree(1,0,ptr-1);
+        
+        
+
+        while(1)
+        {
+            char ch[100];
+            scanf("%s",&ch);
+
+            if(ch[0]=='D') break;
+            int l,r;
+            SC(l);SC(r);
+            if(ch[0]=='C') {
+                update(1,0,ptr-1,posInBase[edgeInd[l-1]],r);
+            }
+            else 
+            {
+//                cout<<1<<endl;
+                //for(int i=0;i<ptr;i++) PR(query(1,0,ptr-1,i,i))E
+                printf("%d\n" , query_tree(l,r) );
+            }
+        }
+
+    }   
+	
+}

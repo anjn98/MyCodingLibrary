@@ -1,0 +1,42 @@
+ll tree[N<<2],lazy[N<<2];
+int nxt[N];
+
+void push(int nd,int l,int r)
+{
+	if(lazy[nd]==0) 
+		return ;
+	tree[nd]+= (r-l+1)*lazy[nd];
+	if(l!=r)
+	{
+		lazy[nd+nd] += lazy[nd];
+		lazy[nd+nd+1] += lazy[nd];
+	}
+	lazy[nd]=0;
+}
+void update(int nd,int l,int r,int i,int j,int val)
+{
+	push(nd,l,r);
+	if(r<i || l>j || l>r) return ;
+	if(i<=l && r<=j)
+	{
+		lazy[nd]=val;	
+		push(nd,l,r); 
+		return;
+	}
+	int lt= nd<<1 , rt=lt|1 , mi=(l+r)/2;
+	update(lt,l,mi,i,j,val);
+	update(rt,1+mi,r,i,j,val);
+	tree[nd]=tree[lt] + tree[rt];
+}
+ll query(int nd,int l,int r,int i,int j)
+{
+	if(r<i || l>j || l>r) 
+		return 0;
+	push(nd,l,r);
+	if(i<=l && r<=j)
+		return tree[nd];
+	int lt= nd<<1 , rt=lt|1 , mi=(l+r)/2;
+
+	return query(lt,l,mi,i,j) + query(rt,1+mi,r,i,j);
+}
+

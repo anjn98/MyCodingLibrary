@@ -1,0 +1,29 @@
+const int maxn=2e3;
+ll bit[maxn][maxn];
+void update(int x,int y,ll val)			// UPDATE POINT (x,y) to val
+{
+	for(int i=x;i<maxn;i+=i&-i)
+		for(int j=y;j<maxn;j+=j&-j)
+			bit[i][j]+=val;
+}
+
+ll query(int x,int y)				// GET SUM OF RECTANGLE (0,0) TO (x,y)
+{
+	ll ans=0;
+	for(int i=x;i>0;i-=i&-i)
+		for(int j=y;j>0;j-=j&-j)
+			ans+=bit[i][j];
+	return ans;	
+}
+
+ll query(int x1,int y1,int x2,int y2)		//GET SUM OF RECTANGLE FROM (x1,y1) TO (x2,y2)
+{
+	ll ans=query(x2,y2);
+	ans-=query(x1-1,y2);
+	ans-=query(x2,y1-1);
+	ans+=query(x1-1,y1-1);
+	return ans;
+}
+	
+
+

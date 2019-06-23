@@ -1,0 +1,92 @@
+/*
+  https://www.spoj.com/problems/MKTHNUM/
+	https://www.spoj.com/status/MKTHNUM,anjn98/	
+
+FOR TREE BASED REFER
+	https://www.spoj.com/problems/COT/
+	https://www.spoj.com/status/COT,anjn98/
+
+*/
+const int N=1e5+99;
+ll a[N],tree[21*N],lc[21*N],rc[21*N],root[N],node,n,m,mp[N];
+
+int build(int l,int r)
+{
+    int nd=node++;
+    if(l==r) return nd;
+    int mi=(l+r)/2;
+    lc[nd]=build(l,mi);
+    rc[nd]=build(mi+1,r);
+    return nd;
+}
+
+int update(int on,int l,int r,int p)
+{
+    int nd=node++;
+    if(l==r)
+    {
+        tree[nd]=tree[on]+1; return nd;
+    }
+    lc[nd]=lc[on];
+    rc[nd]=rc[on];
+    int mi=(l+r)/2;
+    if(p<=mi)
+        lc[nd]=update(lc[on],l,mi,p);
+    else 
+        rc[nd]=update(rc[on],mi+1,r,p);
+    tree[nd]=tree[lc[nd]]+ tree[rc[nd]];
+    return nd;
+}
+
+int query(int lb,int rb,int l,int r,int k)
+{
+    if(l==r)
+        return l;
+    int rem= tree[lc[rb]] - tree[lc[lb]];
+    int mi=(l+r)/2;
+
+    if(k<=rem)
+        return query(lc[lb],lc[rb] , l , mi, k );
+    else 
+        return query(rc[lb],rc[rb], mi+1 , r, k-rem);
+}
+
+
+int main() 
+{
+    IO
+    #ifndef ONLINE_JUDGE
+    FILEIO
+    #endif
+    
+    cin>>n>>m;
+    fr(n) cin>>a[i+1];
+    
+
+    vector<pii> vv;
+    for(int i=1;i<=n;i++) vv.PB({a[i],i});
+
+    sort(all(vv));
+    for(int i=0;i<n;i++)
+    {
+        a[vv[i].S]=i+1;
+        mp[i+1]=vv[i].F;
+    }
+    
+    root[0]=build(1,n);
+    for(int i=1;i<=n;i++)
+        root[i]=update(root[i-1],1,n,a[i]);
+
+    for(int i=0;i<m;i++)
+    {
+        int l,r,k;
+        cin>>l>>r>>k;
+        int ans=query(root[l-1], root[r],1,n,k);
+        cout<<mp[ans]<<endl;
+    }
+
+ 
+    return 0;
+}
+ 
+ 

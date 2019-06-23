@@ -1,0 +1,22 @@
+const int maxn=1e5+99;
+ll bit1[maxn],bit2[maxn];
+
+
+void update(ll* bit,int i,ll val){
+	while(i<maxn) bit[i]+=val,i+=i&-i;
+}
+
+void update(int l,int r,ll val){
+	update(bit1,l,val);update(bit1,r+1,-val);
+	update(bit2,l,val*(l-1));update(bit2,r+1,-val*r );
+}
+
+ll query(int i){
+	ll ans=0,ans2=0,X=i;
+	while(i>0) ans+=bit1[i],ans2+=bit2[i],i-=i&-i;
+	return ans*X-ans2;
+}
+
+ll query(int l,int r){
+	return query(r) - query(l-1);
+}

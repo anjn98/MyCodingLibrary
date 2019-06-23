@@ -1,0 +1,40 @@
+
+
+
+class SEGTREE{
+
+public:
+	const int maxn=1e5;
+	ll tree[4*maxn];
+
+	ll merge(ll a,ll b)
+	{
+		ll ret=max(a,b);
+		return ret;
+	}
+
+	void build_tree(int node,int a,int b)
+	{
+		if(a>b) return ;
+		if(a==b){tree[node]=arr[a];  return;}
+		build_tree(node*2,a,(a+b)/2);
+		build_tree(1+node*2,1+(a+b)/2,b);
+		tree[node]=merge(tree[node*2],tree[1+2*node]);
+	}
+
+	ll query(int node ,int a,int b,int i,int j)
+	{
+		if(j<a || i>b){ll ret;return ret;}
+		if(a>=i && b<=j) return tree[node];
+		return merge ( query(2*node,a,(a+b)/2,i,j), query(1+2*node,1+(a+b)/2,b,i,j) );        
+	}
+	
+	void update_tree(int node,int a,int b,int i,int value)
+	{
+	  	if(i<a || i>b) return;
+		if(a==b){tree[node]=value;   return;}
+	  	update_tree(node*2,a,(a+b)/2,i,value);
+	  	update_tree(1+node*2,1+(a+b)/2,b,i,value);
+	  	tree[node]=merge(tree[node*2],tree[1+node*2]);
+	}
+}; 

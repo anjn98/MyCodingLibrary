@@ -1,0 +1,56 @@
+/*		https://www.spoj.com/problems/TOPOSORT/
+	The code below is just a slight modification of Kahns Algorithm 
+		
+								*/
+
+const int N=1e5+99;
+int n,m;
+vector<int> g[N],rg[N];
+int indeg[N];
+vector<int> topo;
+bool toposort()
+{
+
+    for(int i=1;i<=n;i++)
+        trav(x,g[i]) indeg[x]++;
+    
+    priority_queue<int,vector<int>, greater<int>> pq;
+    
+    for(int i=1;i<=n;i++)
+        if(!indeg[i]) pq.push(i);
+
+    while(!pq.empty())
+    {
+        int  v=pq.top();    
+        pq.pop();
+        topo.PB(v);
+        trav(x,g[v])
+            indeg[x]--;
+        trav(x,g[v]) 
+            if(!indeg[x]) pq.push(x);            
+    }
+    
+    return topo.size()==n;
+}
+
+int main() 
+{
+    IO
+	#ifndef ONLINE_JUDGE
+	FILEIO
+	#endif
+    cin>>n>>m;    
+    fr(m)
+    {
+        int x,y;
+        cin>>x>>y;
+        g[x].PB(y);
+    }
+    if(!toposort()){
+        cout<<"Sandro fails."<<endl;
+        return 0;
+    }
+    trav(x,topo)
+        cout<<x<<" ";  ED
+	
+}

@@ -1,0 +1,108 @@
+//https://codeforces.com/contest/1000/submission/52505494  
+
+
+const int N=3e5+99;
+
+vector<pii> g[N];   //   Input Graph Details
+int edge[N],tin[N],low[N],vis[N],timer;        //   Elemenst for bridge detection
+
+
+//---------------------------GETTING BRIDGES------------------
+void find_bridge(int v,int p)
+{   
+    vis[v]=1;
+    tin[v]=low[v]=++timer;
+    trav(x,g[v])
+    {
+        if(x.F==p) continue;
+        if(vis[x.F]) low[v]=min(low[v],tin[x.F]);
+        else
+        {
+            find_bridge(x.F,v);
+            low[v]=min(low[v],low[x.F]);
+        }
+        if(low[x.F]>tin[v]) edge[x.S]=1;
+    }
+}
+
+//-----------------------BRIDGE TREE CONSTRUCTION----------------
+vector<int> bt[N];bool vis1[N];
+int cmp=1;
+
+void dfs(int v)
+{
+    int cur=cmp;
+    vis1[v]=1;
+    queue<int> qq;qq.push(v);
+    
+    while(!qq.empty())
+    {
+        int u=qq.front();qq.pop();
+        trav(x,g[u])
+        {
+            if(vis1[x.F]) continue;
+            if(edge[x.S])
+            {
+                cmp++;
+                bt[cmp].PB(cur);
+                bt[cur].PB(cmp);
+                dfs(x.F);
+            }
+            else
+            {
+                qq.push(x.F);
+                vis1[x.F]=1;
+            }
+        }
+    }
+}
+ll ans=0;
+
+ll dfss(int v,int p)
+{
+    ll t1=0,t2=0;
+    trav(x,bt[v])   
+    {
+        if(x==p) continue;
+
+        ll tt=dfss(x,v)+1;
+        if(tt>=t1) t2=t1,t1=tt;
+        else if(tt>t2) t2=tt;
+    }
+    ans=max(ans,t1+t2);
+    return t1;
+}
+
+
+
+int main() 
+{
+    IO
+    #ifndef ONLINE_JUDGE
+    FILEIO
+    #endif
+
+    int n,m;
+    cin>>n>>m;
+    fr(m)
+    {
+        int x,y;cin>>x>>y;
+        g[x].PB({y,i});
+        g[y].PB({x,i});
+    }
+    find_bridge(1,-1);
+    dfs(1);
+    dfss(1,1);
+
+//    fr(m) cout<<edge[i]<<" ";ED
+
+    cout<<ans<<endl;
+
+
+}
+
+
+
+
+
+

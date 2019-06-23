@@ -1,0 +1,40 @@
+// Code taken from https://github.com/anjn98/MyCodingLibrary/blob/master/Dijkstra
+
+vector<pll> g[N];
+ll dis[N];
+
+struct COMP{
+    bool operator()(int a,int b)
+    {
+        if(dis[a]!=dis[b])
+            return dis[a]<dis[b];
+        return a<b;}
+};
+
+set<int,COMP> DJ;
+
+void dijkstra(int s)
+{
+    DJ.insert(s);    
+    for(int i=0;i<N;i++) dis[i]=1e17;
+    dis[s]=0;
+    
+    
+    while(!DJ.empty())
+    {
+        int v=*DJ.begin();
+        DJ.erase(v);
+        if(v==n) break;
+
+        for(auto x:g[v])
+        {
+           
+            if(dis[v]+x.S>=dis[x.F]) continue;
+            DJ.erase(x.F);
+            dis[x.F]=dis[v]+x.S;
+            DJ.insert(x.F);
+        }
+        
+        
+    }
+}

@@ -1,0 +1,23 @@
+const int N=3e5+99;
+
+vector<pii> g[N];   //   Input Graph Details
+int edge[N],tin[N],low[N],vis[N],timer;        //   Elemenst for bridge detection
+
+
+//---------------------------GETTING BRIDGES------------------
+void find_bridge(int v,int p)
+{   
+    vis[v]=1;
+    tin[v]=low[v]=++timer;
+    trav(x,g[v])
+    {
+        if(x.F==p) continue;
+        if(vis[x.F]) low[v]=min(low[v],tin[x.F]);
+        else
+        {
+            find_bridge(x.F,v);
+            low[v]=min(low[v],low[x.F]);
+        }
+        if(low[x.F]>tin[v]) edge[x.S]=1;
+    }
+}

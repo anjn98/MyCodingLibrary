@@ -1,0 +1,48 @@
+vector<int> g[N],g2[N];// original and reversed graph
+vector<int> order;// order in which vertices are visited
+int cmpi[N];//component index of a vertex
+bool vis[N];
+int indx=0;
+
+void dfs1 (int v) 
+{
+    vis[v]=1;
+    for(auto x:g[v])
+        if(!vis[i])
+            dfs1(x);
+    order.push_back (v);
+}
+
+void dfs2 (int v) 
+{
+    cmpi[v]=indx;    
+    for(auto x:g2[v])
+        if(!cmpi[v])
+            dfs2(x);
+}
+
+int main()
+{
+
+    int n;// number of vertices
+    int m;// number of edges
+
+    for(int i=0;i<m;i++)
+    {
+        int u,v;
+        cin>>u>>v;
+        g[u].push_back(v);
+        g2[v].push_back(u);
+    }
+
+    reverse(order.begin(),order.end());
+
+    for(auto x:order)
+    {
+        if(!cmpi[x])
+        {
+            indx++;
+            dfs2(x);
+        }
+    }
+}

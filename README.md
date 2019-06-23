@@ -4,7 +4,7 @@ This library is contains my implementation of sapmre famous and commonly encount
 
 I will also keep try to keep adding new algorithms and data structures from time to time.
 
-Below are the links of my cp webite links
+Below are the links of my account in cp webites
 
 #CODEFORCES
   http://codeforces.com/profile/anjn98

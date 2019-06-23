@@ -1,0 +1,9 @@
+long long mu[15000002];
+
+void pre(long long PP)
+{
+     mu[1]=1;
+     for(int i=1;i<=PP;++i)
+        for(int j=2*i;j<=PP;j+=i)
+            mu[j]-=mu[i];
+} 

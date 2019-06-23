@@ -1,0 +1,39 @@
+const int MM=32;		// CHANGE THIS VALUE ACCORDING TO THE QUESTION
+struct trie{
+    struct trie* nxt[2];
+    int cnt;
+};
+trie* head=new trie();
+void insert(ll v)
+{
+    trie* temp=head;
+    for(int i=MM;i>=0;i--)
+    {
+        int bt=(v>>i)&1;
+        if(temp->nxt[ct]==NULL) temp->nxt[bt]=new trie();
+        temp=temp->nxt[ct];
+	temp->cnt++;
+    }    
+}
+
+ll query(ll v)
+{
+    trie* temp=head;ll ans=0;
+    for(int i=MM;i>=0;i--)
+    {
+        int bt=(v>>i)&1;
+        if(temp->nxt[!bt]!=NULL && temp->nxt[!bt]->cnt>0) temp=temp->nxt[!bt],ans+=(1LL<<i);
+        else temp=temp->nxt[bt];
+    }
+    return ans;
+}
+
+void remove(ll v)
+{
+    trie* temp=head;
+    for(int i=MM;i>=0;i--)
+    {
+        int bt=(v>>i)&1;
+        temp=temp->nxt[bt];temp->cnt--;
+    }  
+}

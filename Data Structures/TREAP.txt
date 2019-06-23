@@ -1,0 +1,217 @@
+/*
+
+		https://www.codechef.com/problems/CARDSHUF/
+		https://www.spoj.com/problems/GSS6/(below is the solution)
+
+*/
+
+
+
+//-----------------------------------------TREAP BEGINS-------------------------------
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+int csrand(int l=0, int r=1e9){
+    uniform_int_distribution<int> uid(l, r);
+    return uid(rng);
+}
+
+//-----------------------------------------TREAP BEGINS-------------------------------
+struct node{
+    int val,prior,size,lazy;
+    node *l,*r;
+    int data,pf,sf,sum;       // This is the query part data such as sum or min/max
+    node(){}
+    node(int val1,int prior1):val(val1),prior(prior1),size(0),lazy(0),l(NULL),r(NULL),data(val1),sum(val1),pf(val1),sf(val1){}
+};
+int sz(node* nd){
+    return nd?nd->size:0;
+}
+void upd_sz(node* nd){
+    if(nd)   nd->size=sz(nd->l)+sz(nd->r)+1;
+}
+void reset(node *nd){
+    if(nd) nd->data=nd->pf=nd->sf=nd->sum=nd->val;
+}
+void combine(node* &nd,node *l,node *r){
+    if(l==NULL || r==NULL)  return void(nd=l?l:r);
+    nd->data=max( max(l->data,r->data) , l->sf + r->pf);
+    nd->pf= max(l->pf, l->sum+r->pf);
+    nd->sf= max(r->sf, r->sum+l->sf);
+    nd->sum=l->sum+r->sum;
+}
+void lazy(node* nd) 
+{
+    if(nd && nd->lazy)
+    {
+        nd->lazy=0;
+        swap(nd->l,nd->r);
+        if(nd->l) nd->l->lazy^=1;
+        if(nd->r) nd->r->lazy^=1;
+    }
+}
+
+void operation(node* nd){
+    if(nd==NULL) return ;
+    reset(nd);
+    lazy(nd->l);lazy(nd->r);
+    combine(nd,nd->l,nd);   combine(nd,nd,nd->r);
+}
+
+void split(node* nd,node* &l,node* &r,int key,int add=0)
+{
+    if(nd==NULL)      return void(l=r=NULL);
+    lazy(nd);
+    int cur=add+sz(nd->l);
+    if(key<=cur)
+        split(nd->l,l,nd->l,key,add),r=nd;
+    else
+        split(nd->r,nd->r,r ,key,add+1+sz(nd->l)),l=nd;
+    upd_sz(nd);
+    operation(nd);
+}
+    
+void merge(node* &nd,node* l,node* r)
+{
+    lazy(l),lazy(r);
+
+    if(!l)  nd=r;
+    else if(!r) nd=l;
+    else if(l->prior > r->prior)
+        merge(l->r,l->r,r),nd=l;
+    else 
+        merge(r->l,l,r->l),nd=r;
+    upd_sz(nd);
+    operation(nd);
+}
+
+void insert_build(node* &nd,node* it,int pos,int add=0) // add is 0 indexd  and only used while constructinh treap
+{
+    if(!nd)
+        return void(nd=it);
+    lazy(nd);
+    int cur=sz(nd->l)+add;
+    if(it->prior > nd->prior)
+        split(nd,it->l,it->r,pos),nd=it;
+    else if(pos<=cur)
+        insert_build(nd->l,it,pos,add);
+    else insert_build(nd->r,it,pos,add+1+sz(nd->l));
+}
+void insert_random(node* &nd,int pos,int val) // pos is 1-indexed it is used to insert nodes in the middle of treap
+{
+    node *l,*r,*mid,*fi;
+    split(nd,l,r,pos-1);
+    node *temp=new node(val,csrand());
+    merge(fi,temp,r);
+    merge(nd,l,fi);
+}
+void remove(node* &nd,int pos) // pos is 1-indexed
+{
+    node *l,*r,*mid;
+    split(nd,l,r,pos-1);
+    split(r,mid,r,1);
+    merge(nd,l,r);
+
+}
+void replace(node* &nd,int pos,int val) // pos is 1-indexed
+{
+    node *l,*r,*mid,*fi;
+    split(nd,l,r,pos-1);
+    split(r,mid,r,1);
+    node *temp=new node(val,csrand());
+    merge(fi,temp,r);
+    merge(nd,l,fi);
+}
+
+void print_treap(node* nd)
+{
+    if(nd==NULL) return;
+    lazy(nd);
+    print_treap(nd->l);
+    cout<<nd->val<<" ";
+    print_treap(nd->r);
+}
+ll query(node* nd,int l,int r) //[l,r] 1 indexed
+{
+    node *lp,*mp,*rp;
+    split(nd,lp,mp,l-1);
+    split(mp,nd,rp,r-l+1);
+    int ans=nd->data;
+    merge(mp,lp,nd);
+    merge(nd,mp,rp);
+    return ans;
+}
+void update(node* nd,int l,int r,int val) //[l,r] 1-indexed
+{
+    node *lp,*rp,*mp;
+    split(nd,lp,mp,l-1);
+    split(mp,nd,rp,r-l+1);
+    nd->lazy+=val;          //This is to be modified
+    merge(mp,lp,nd);
+    merge(nd,mp,rp);
+}
+
+
+
+//-----------------------------------------TREAP ENDS-------------------------------
+
+node* treap;
+
+
+int main() 
+{
+    
+    IO
+    #ifndef ONLINE_JUDGE
+    FILEIO
+    #endif
+    int n,m,x;treap=NULL;
+    cin>>n;
+    fr(n)
+    {
+        cin>>x;
+        node *temp=new node(x,csrand());
+        insert_build(treap,temp,i);
+    }
+
+    cin>>m;	
+    while(m--)
+    {
+        char ch;int l,r;
+        cin>>ch>>l;
+        if(ch=='I')
+        {
+            cin>>r;
+        	insert_random(treap,l,r);
+        }
+        else if(ch=='D')
+        	remove(treap,l);
+
+
+        else if(ch=='R')
+        {
+            cin>>r;
+            replace(treap,l,r);
+        }
+        else 
+        {
+            cin>>r;
+            cout<<query(treap,l,r)<<endl;
+        }
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

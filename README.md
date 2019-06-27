@@ -8,6 +8,7 @@ Below are the links of my account in cp webites
 
 #CODEFORCES
   http://codeforces.com/profile/anjn98
+  var output="https://codeforces.com/api/user.info?handles=anjn98"
 
 #CODECHEF
   https://www.codechef.com/users/anjn98

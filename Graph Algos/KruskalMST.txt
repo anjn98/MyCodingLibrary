@@ -1,0 +1,39 @@
+const int N=1e5+99; 
+
+int par[N],sz[N];
+
+
+int get(int v) {
+    if (v == par[v])
+        return v;
+    return par[v] = get(par[v]);
+}
+
+bool merge1(int x,int y)
+{
+    x=get(x);
+    y=get(y);
+
+    if(x==y) return 0;
+
+    if(sz[x]<sz[y]) swap(x,y);
+    par[y]=x;
+    sz[x]+=sz[y];
+    return 1;
+}
+
+ll kruskal(vector<pair<ll,pll>> edges)
+{
+    sort(all(edges));
+    fr(N)par[i]=i,sz[i]=1;
+    ll ans=0;
+
+    for(auto x:edges)
+    {
+        ll wt=x.F,u=x.S.F,v=x.S.S;
+        if(get(u)!=get(v))
+        merge1(u,v),
+        ans+=wt;
+    }
+    return ans;
+}

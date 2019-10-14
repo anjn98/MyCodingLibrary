@@ -7,3 +7,23 @@ Exmple Problem
 
 https://www.spoj.com/problems/COT2/
 Solution:https://www.spoj.com/status/COT2,anjn98
+
+ow that we're equipped with the necessary weapons, let's understand how to process the queries.
+
+Let a query be (u, v). We will try to map each query to a range in the flattened array. Let ST(u) ≤ ST(v) where ST(u) denotes visit time of node u in T. Let P = LCA(u, v) denote the lowest common ancestor of nodes u and v. There are 2 possible cases:
+
+Case 1: P = u
+
+In this case, our query range would be [ST(u), ST(v)]. Why will this work?
+
+Consider any node x that does not lie in the (u, v) path.
+Notice that x occurs twice or zero times in our specified query range.
+Therefore, the nodes which occur exactly once in this range are precisely those that are on the (u, v) path! (Try to convince yourself of why this is true : It's all because of dfs() properties.)
+
+This forms the crux of our algorithm. While implementing Mo's, our add/remove function needs to check the number of times a particular node appears in a range. If it occurs twice (or zero times), then we don't take it's value into account! This can be easily implemented while moving the left and right pointers.
+
+Case 2: P ≠ u
+
+In this case, our query range would be [EN(u), ST(v)] + [ST(P), ST(P)].
+
+The same logic as Case 1 applies here as well. The only difference is that we need to consider the value of P i.e the LCA separately, as it would not be counted in the query range.
